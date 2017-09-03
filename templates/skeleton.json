@@ -1,0 +1,39 @@
+{
+  "variables": {
+    "aws_access_key": "",
+    "aws_secret_key": ""
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "eu-west-1",
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "some_name {{timestamp}}",
+    "access_key": "{{user `aws_access_key`}}",
+    "secret_key": "{{user `aws_secret_key`}}",
+    "ami_description": "some_description",
+    "associate_public_ip_address": "true",
+    "source_ami_filter": {
+        "filters": {
+            "virtualization-type": "hvm",
+             "name": "*ubuntu-xenial-16.04-amd64-server-*",
+             "root-device-type": "ebs"
+         },
+         "owners": ["099720109477"],
+         "most_recent": true
+        }
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sleep 30",
+      "sudo apt-get update",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -yq"
+    ]},
+    {
+    "type": "shell",
+    "script": "provisioners/shell/some_script.sh",
+    "execute_command": "sudo bash {{ .Path }}"
+    }
+  ]
+}
